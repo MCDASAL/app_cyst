@@ -9,7 +9,7 @@ import os
 import joblib
 from io import BytesIO
 import numpy as np
-import proc_img
+import util.proc_img as proc_img
 from collections import Counter
 from flask import Flask, request, jsonify, send_file
 
