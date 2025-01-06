@@ -19,11 +19,11 @@ def crop_img(image):
     # Definimos el radio de engrosamiento
     footprint = disk(3)
     
-    # Convertimos la imagen a escala de grises
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # # Convertimos la imagen a escala de grises
+    # gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
     # Usamos un filtro gaussiano
-    blurred_image = cv2.GaussianBlur(gray_image, (5, 5), 0)
+    blurred_image = cv2.GaussianBlur(image, (5, 5), 0)
     
     # Dilatamos los bordes BLANCOS encontrados en la imagen al radio previamente definido
     dilated = dilation(blurred_image, footprint)
@@ -64,7 +64,7 @@ def crop_img(image):
     center_kidney_right = (cx + math.ceil(distance_right / 2), cy + math.ceil(distance_bottom / 5))
     
     # Obtener el tamaño de la imagen
-    altura, anchura, canales = image.shape
+    altura, anchura = image.shape
     
     # Definimos el tamaño del recorte dependiendo de la medida más grande de la imagen
     crop_size = max(int(altura * 0.3), int(anchura * 0.3))
@@ -192,17 +192,20 @@ def visualize_classified_image(image, positions, predictions, block_size = 3):
 
      return overlay
 
-def img_org_class (img_org,kidne_left,Kidney_right,coords_left,coords_right):
-     # Creamos una copia de la imagen original para evitar modificarla directamente
-     combined_image = img_org.copy()
-     
-     # Insertamos el recorte izquierdo tratado en las coordenadas correspondientes
-     xl1, yl1, xl2, yl2 = coords_left
-     combined_image[yl1:yl2, xl1:xl2] = cv2.resize(kidne_left, (xl2 - xl1, yl2 - yl1))
-     
-     # Insertamos el recorte derecho tratado en las coordenadas correspondientes
-     xr1, yr1, xr2, yr2 = coords_right
-     combined_image[yr1:yr2, xr1:xr2] = cv2.resize(coords_right, (xr2 - xr1, yr2 - yr1))
-     
-     # Retornamos la imagen combinada
-     return combined_image
+def img_org_class (img_org,kidney_left,Kidney_right,coords_left,coords_right):
+    # Creamos una copia de la imagen original para evitar modificarla directamente
+    combined_image = img_org.copy()
+
+    if combined_image.ndim == 2:
+        combined_image = cv2.cvtColor(combined_image, cv2.COLOR_GRAY2RGB)
+    
+    # Insertamos el recorte izquierdo tratado en las coordenadas correspondientes
+    xl1, yl1, xl2, yl2 = coords_left
+    combined_image[yl1:yl2, xl1:xl2] = cv2.resize(kidney_left, (xl2 - xl1, yl2 - yl1))
+    
+    # Insertamos el recorte derecho tratado en las coordenadas correspondientes
+    xr1, yr1, xr2, yr2 = coords_right
+    combined_image[yr1:yr2, xr1:xr2] = cv2.resize(Kidney_right, (xr2 - xr1, yr2 - yr1))
+    
+    # Retornamos la imagen combinada
+    return combined_image
